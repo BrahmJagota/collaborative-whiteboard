@@ -13,27 +13,31 @@ export const Home:React.FC<BoardProps> = ({socket}) => {
 
     const {roomId, setRoomId} = useToolsContext();
     const navigate = useNavigate();
-    const {user, setUser} = useAuthContext()
+    const {user} = useAuthContext()
     useEffect(() => {
         const token = localStorage.getItem('token');
-        axios.get('/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-              },
-        })
-        .then((res) => {
+        // axios.get('/me', {
+        //     headers: {
+        //         'Authorization': `Bearer ${token}`,
+        //       },
+        // })
+        // .then((res) => {
 
-            setUser({userId: res.data._id, email: res.data.email, boardId: res.data.boardId})     
-                   console.log('res', res.data)
-            socket.emit('room-joined', {userId: res.data._id, roomId: res.data.boardId})
-        })
-        .catch(error => {
-            console.error('Error fetching user data:', error);
-          });
+        //     setUser({userId: res.data._id, email: res.data.email, boardId: res.data.boardId})     
+        //            console.log('res', res.data)
+        //     socket.emit('room-joined', {userId: res.data._id, roomId: res.data.boardId})
+        // })
+        // .catch(error => {
+        //     console.error('Error fetching user data:', error);
+        //   });
+        if(!token){
+            navigate('/login')
+        }
     },[])
 
     useEffect(() => {
-            
+        console.log("token from home", localStorage.getItem('token'))
+            console.log("user",user)
     },[user])
 
     const handleButton = ()=> {

@@ -1,3 +1,6 @@
+import { JwtPayload } from 'jsonwebtoken';
+import { Request } from 'express';
+
 interface IRoomIds {
     userId: string | undefined,
     socketId: string,
@@ -8,3 +11,9 @@ interface IRoomIds {
 //     boardId: string,
 //     data: 
 // }
+
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: JwtPayload;
+  }
+}

@@ -1,19 +1,18 @@
 import { Request, Router, Response } from "express";
 import {compare, hash} from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import UserModel from "../database/models";
 const router = Router();
-// const JWT_SECRET = "process.env.JWT_SECRET";
 import { nanoid } from "nanoid";
 import bodyParser from "body-parser";
 import express from 'express';
 import dotenv from 'dotenv';
+import { verifyToken } from "../middleware/verify-token";
 const app = express();
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
-console.log(JWT_SECRET)
 app.use(bodyParser.json());
 router.post('/signup', async (req, res) => {
     const { name, email, password } = req.body;
@@ -28,8 +27,9 @@ router.post('/signup', async (req, res) => {
       const user = new UserModel({ name, email, password, boardId });
       await user.save();
   
-      const token = jwt.sign({ userId: user._id },JWT_SECRET, { expiresIn: '48h' });
-      res.status(201).json({ token, user });
+      const token = jwt.sign({ userId: user._id },JWT_SECRET, { expiresIn: '1h' });
+      const refreshToken = jwt.sign({ userId: user._id }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
+      res.status(201).json({ token,refreshToken, user });
     } catch (error) {
       res.status(400).send(error);
     }
@@ -46,15 +46,46 @@ router.post('/signup', async (req, res) => {
       }
   
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
-      res.json({token, user});
+      const refreshToken = jwt.sign({ userId: user._id }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
+      res.json({token, refreshToken, user});
     } catch (error) {
       res.status(400).send(error);
     }
   });
 
-  router.get('/me', async (req, res) => {
+  router.post('/refresh-token', async (req: Request, res: Response) => {
+    console.log("refresh route called")
+  const { refreshToken } = req.body;
+    console.log("refresh token", refreshToken)
+  try {
+    if (!refreshToken) {
+      console.log("no refresh token")
+      return res.status(401).send({ message: 'Refresh token is required' });
+    }
+
+    jwt.verify(refreshToken, JWT_REFRESH_SECRET, (err: VerifyErrors | null, decoded: any) => {
+      if (err) {
+        console.log("errrrrr",err)
+        return res.status(403).send({ message: 'Invalid refresh token' });
+      }
+
+      const { userId } = decoded as  JwtPayload;
+      console.log("userIdd",userId)
+      const newToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' });
+      console.log("new token", newToken)
+      res.json({ token: newToken });
+    });
+  } catch (error) {
+    console.error('Token refresh error: ', error);
+    res.status(500).send({ message: 'An internal server error occurred' });
+  }
+});
+  router.post('/me', verifyToken,async (req, res) => {
+    console.log("me route called")
     const token = req.headers.authorization?.split(' ')[1];
+    console.log("token", token)
     if (!token) {
+      console.log("no token")
       return res.status(401).json({ message: 'Authentication token is missing' });
       }
     try{

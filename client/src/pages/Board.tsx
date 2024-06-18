@@ -16,7 +16,7 @@ interface BoardProps {
 const Board:React.FC<BoardProps> = ({ socket }) => {
   const {boardId} = useParams();
   const {roomId, setRoomId} = useToolsContext();
-  const {user, setUser} = useAuthContext();
+  const {user} = useAuthContext();
   const navigate = useNavigate()
   const hello = "hello"
   if(socket) {
@@ -171,21 +171,24 @@ useEffect(() => {
       console.log("no")
     }, [])
     useEffect(()=> {
-      const token = localStorage.getItem('token');
-        axios.get('/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-              },
-        })
-        .then((res) => {
+      if(user.userId !== '') {
+        navigate('/login')
+      }
+      // const token = localStorage.getItem('token');
+      //   axios.get('/me', {
+      //       headers: {
+      //           'Authorization': `Bearer ${token}`,
+      //         },
+      //   })
+      //   .then((res) => {
 
-            setUser({userId: res.data._id, email: res.data.email, boardId: res.data.boardId})
-            console.log('res', res.data)
-            socket.emit('room-joined', {userId: res.data._id, roomId: res.data.boardId})
-        })
-        .catch(error => {
-            console.error('Error fetching user data:', error);
-          });
+      //       setUser({userId: res.data._id, email: res.data.email, boardId: res.data.boardId})
+      //       console.log('res', res.data)
+      //       socket.emit('room-joined', {userId: res.data._id, roomId: res.data.boardId})
+      //   })
+      //   .catch(error => {
+      //       console.error('Error fetching user data:', error);
+      //     });
       handleCanvaSize()
     },[])
     function handleMouseUp (e: React.MouseEvent) {

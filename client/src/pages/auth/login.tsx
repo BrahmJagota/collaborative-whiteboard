@@ -1,7 +1,6 @@
 import {useState, useEffect} from 'react'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { nanoid } from 'nanoid';
     export const Login = () => {
         const navigate = useNavigate();
         const [email, setEmail] = useState('');
@@ -9,9 +8,8 @@ import { nanoid } from 'nanoid';
         const [error, setError] = useState<string | null>(null);
             useEffect(() => {
                 const token = localStorage.getItem('token');
-                const boardId = nanoid();
                 if (token) {
-                    navigate(boardId);
+                    navigate('/');
                 }
             }, []);
 
@@ -25,8 +23,10 @@ import { nanoid } from 'nanoid';
                 password,
             });
         
-            const { token } = response.data;
+            const { token, refreshToken } = response.data;
+            
             localStorage.setItem('token', token);
+            localStorage.setItem('refreshToken', refreshToken);
             console.log('Login successful, token:', token);
             navigate('/');
             } catch (err) {
