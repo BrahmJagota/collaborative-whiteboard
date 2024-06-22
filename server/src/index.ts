@@ -14,7 +14,7 @@ import{ UserModel,RoomModel, IRoom } from './database/models';
 const httpServer = http.createServer(app);
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: "*",
   methods: ["POST", "GET"],
   credentials: true,
 };
@@ -30,7 +30,7 @@ connectDB()
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://collaborative-whiteboard-cngayikxa-brahmjagotas-projects.vercel.app/",
     credentials: true,
   },
   });

@@ -10,14 +10,14 @@ const socket_io_1 = require("socket.io");
 const cors_1 = __importDefault(require("cors"));
 const httpServer = http_1.default.createServer(app);
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "https://collaborative-whiteboard-cngayikxa-brahmjagotas-projects.vercel.app/login",
     methods: ["POST", "GET"],
     credentials: true,
 };
 app.use((0, cors_1.default)(corsOptions));
 const io = new socket_io_1.Server(httpServer, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "https://collaborative-whiteboard-cngayikxa-brahmjagotas-projects.vercel.app/login",
         credentials: true,
     },
 });
