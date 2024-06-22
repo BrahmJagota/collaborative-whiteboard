@@ -4,7 +4,7 @@
     "install-client": "cd client && npm install",
     "build-client": "cd client && npm run build",
     "dev:client": "cd client && npm run start",
-    "dev:server": "cd server && tsx --watch ./src/index.ts"
+    "dev:server": "cd server && npx tsx --watch ./src/index.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5"
