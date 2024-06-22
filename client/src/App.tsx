@@ -11,8 +11,10 @@ import { Login } from './pages/auth/login';
 import { SignUp } from './pages/auth/signup';
 import Home from './pages/Home';
 import { AuthContextProvider } from './components/context/AuthContext';
+import axios from 'axios';
+axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL;
 
-function App() {
+function App() {  
   const socket: Socket = io('http://localhost:5000');
   return (
     <AuthContextProvider>

@@ -26,7 +26,6 @@ app.use(cors(corsOptions));
 app.use('/', authRoutes);
 dotenv.config();
 connectDB()
-console.log("env", process.env.JWT_SECRET)
 
 
 const io = new Server(httpServer, {
@@ -39,7 +38,6 @@ const io = new Server(httpServer, {
   
 
   io.on('connection',async (socket: Socket) => {
-    console.log('A user connected. Socket ID:', socket.id);
     socket.on("room-joined",async (data: IRoom) => {
       const result = await UserModel.findOne({data: data.userId});
       if(result) {
@@ -49,17 +47,16 @@ const io = new Server(httpServer, {
     
 
     socket.on('disconnect', () => {
-        console.log('User disconnected. Socket ID:', socket.id);
+        console.log('User disconnected');
     });
 
     socket.on('error', (err: Error) => {
         console.error('Socket error:', err);
     });
-    socket.on("hello",(data) => console.log("data",data))
 
     socket.on("draw", async (data) => {
       const user = await UserModel.findOne({boardId: data.boardId})
-      console.log("dataaaa", data.userId)
+
       if(user) {
         socket.join(user.boardId);
         io.to(user.boardId).emit("draw", data.data);
@@ -67,6 +64,6 @@ const io = new Server(httpServer, {
     })
 });
 
-httpServer.listen(5000, () => {
-    console.log("app is listening to localhost:5000");
+httpServer.listen(process.env.PORT, () => {
+    console.log("app is listening to localhost");
 });

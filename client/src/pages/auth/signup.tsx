@@ -1,18 +1,18 @@
 import {useState, useEffect} from 'react'; 
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { nanoid } from 'nanoid';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../../components/context/AuthContext';
     export const SignUp = () => {
         const navigate = useNavigate();
+        const {isLoggedIn} = useAuthContext();
         const [email, setEmail] = useState('');
         const [username, setUsername] = useState('');
         const [password, setPassword] = useState('');
         const [error, setError] = useState<string | null>(null);
             useEffect(() => {
-                const token = localStorage.getItem('token');
-                if (token) {
+                if (isLoggedIn) {
                     navigate('/');
-                }
+                } 
             }, []);
 
         const handleSubmit = async (e: React.FormEvent) => {
@@ -20,16 +20,18 @@ import { nanoid } from 'nanoid';
             setError(null);
         
             try {
-            const response = await axios.post('http://localhost:5000/signup', {
+            const response = await axios.post('/signup', {
                 name: username,
                 email,
                 password,
             });
-        
-            const { token } = response.data;
+        if(response) {
+            const { token, refreshToken } = response.data;
             localStorage.setItem('token', token);
-            console.log('Login successful, token:', token);
+            localStorage.setItem('refreshToken', refreshToken);
+
             navigate('/');
+        }
             } catch (err) {
             if (axios.isAxiosError(err) && err.response) {
                 setError(err.response.data.message || 'Signup failed');
@@ -82,6 +84,8 @@ import { nanoid } from 'nanoid';
                 />
                 <span className="ml-2 text-gray-700">Remember Me</span>
               </label>
+              <Link to="/login" className="text-gray-700 hover:underline" >Log in</Link>
+
             </div>
             {error && <div className="mb-4 text-red-500">{error}</div>}
             <button

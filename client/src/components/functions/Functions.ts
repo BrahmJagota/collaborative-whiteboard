@@ -22,7 +22,6 @@ export function mouseDown (e: React.MouseEvent, shapes: IShape[]) {
     let index = 0;
     for(let shape of shapes){
         if(isMouseInShape(startX, startY, shape)) {
-            console.log("yes it is in the shape");
             bool = true;
             curr_index = index; 
             return; 
@@ -46,7 +45,6 @@ export function mouseMove (context: CanvasRenderingContext2D, canvas:HTMLCanvasE
     let mouseY = e.nativeEvent.offsetY;
     let dx = mouseX - startX;
     let dy = mouseY - startY;
-    console.log(dx, dy)
     
     let currShape = shapes[curr_index];
     currShape.x += dx;

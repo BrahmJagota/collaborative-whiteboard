@@ -15,8 +15,7 @@ interface BoardProps {
 
 const Board:React.FC<BoardProps> = ({ socket }) => {
   const {boardId} = useParams();
-  const {roomId, setRoomId} = useToolsContext();
-  const {user} = useAuthContext();
+  const {user, isLoggedIn} = useAuthContext();
   const navigate = useNavigate()
   const hello = "hello"
   if(socket) {
@@ -46,7 +45,6 @@ const Board:React.FC<BoardProps> = ({ socket }) => {
   });
   let prevX:number, prevY: number;
     function handleMove(e: React.MouseEvent) {
-      // console.log(e.nativeEvent.offsetX);
       if(isDrawing){
       drawing(e)
       }
@@ -60,7 +58,6 @@ const Board:React.FC<BoardProps> = ({ socket }) => {
       const x = e.nativeEvent.offsetX;
     const y = e.nativeEvent.offsetY;
     setPrevCords({ x, y });
-      console.log("saet", prevCords)
       const context = canvas?.getContext('2d')
       context?.beginPath();      
       const width = canvas?.width ?? 0;
@@ -78,7 +75,6 @@ const Board:React.FC<BoardProps> = ({ socket }) => {
     }
     }
 useEffect(()=> {
-  console.log(stateStack)
   
   setIndex(prevIndex => prevIndex + 1);
   if(canvas){
@@ -116,7 +112,6 @@ useEffect(() => {
       if(canvas) {
       canvas.width = canvas?.offsetWidth
       canvas.height = canvas?.offsetHeight
-      console.log("dekh", canvas?.offsetWidth )
       }
     }
     // to give canvas a default white color
@@ -125,8 +120,6 @@ useEffect(() => {
       if(context){
         context.fillStyle = '#fff'
         context?.fillRect(0, 0, context.canvas.width, context.canvas.height)  
-        console.log(context.canvas.width)
-        console.log("Yyes")
       }
     },[context])
     function drawing (e: React.MouseEvent) {
@@ -149,7 +142,6 @@ useEffect(() => {
         } else if(selectedTool === 'line'){
           drawLine(e, prevCords, context, color)
         } else {
-          console.log("unvalid entry")
         }
       }
     }
@@ -165,30 +157,12 @@ useEffect(() => {
         context?.fillRect(0, 0, context.canvas.width, context.canvas.height)
         context.fillStyle = '#272727'
         context.fillRect(10, 10, 100, 50)
-        console.log(context.canvas.width)
-        console.log("yes")
       }
-      console.log("no")
     }, [])
     useEffect(()=> {
-      if(user.userId !== '') {
+      if(!isLoggedIn) {
         navigate('/login')
       }
-      // const token = localStorage.getItem('token');
-      //   axios.get('/me', {
-      //       headers: {
-      //           'Authorization': `Bearer ${token}`,
-      //         },
-      //   })
-      //   .then((res) => {
-
-      //       setUser({userId: res.data._id, email: res.data.email, boardId: res.data.boardId})
-      //       console.log('res', res.data)
-      //       socket.emit('room-joined', {userId: res.data._id, roomId: res.data.boardId})
-      //   })
-      //   .catch(error => {
-      //       console.error('Error fetching user data:', error);
-      //     });
       handleCanvaSize()
     },[])
     function handleMouseUp (e: React.MouseEvent) {
@@ -196,7 +170,7 @@ useEffect(() => {
     const y = e.nativeEvent.offsetY;
       setCurrCords({x , y})
       if(canvas){
-        socket.emit('draw', {data:canvas.toDataURL(), boardId: boardId, userId: user.userId});
+        socket.emit('draw', {data:canvas.toDataURL(), boardId: user.boardId, userId: user.userId});
       }
       setIsDrawing(false)
       if(selectedTool !== 'select'){
@@ -206,7 +180,7 @@ useEffect(() => {
     socket.on('draw', (dataUrl) => {
       if(canvasRef.current){
       const image = new Image();
-      image.src = dataUrl;
+      image.src = dataUrl;  
       image.onload = () => {
         context?.drawImage(image, 0, 0);
       };
@@ -223,13 +197,14 @@ useEffect(() => {
       setShapes(prevShapes => [...prevShapes, shape]);
     },[temp])  
     useEffect(()=> {
-      console.log("shapes", shapes)
     },[shapes])
 
     // donot remove this useEffect as without it the shape is being set twice as an empty object
     useEffect(()=> {
       setShapes([])
     },[])
+
+    
   return (
     <>
     <div className='test relative'>

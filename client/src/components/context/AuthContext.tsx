@@ -1,12 +1,12 @@
 import { useState, useEffect, createContext, ReactNode, useContext, FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-axios.defaults.baseURL = 'http://localhost:5000';
 interface IAuthContext {
   user: IUser;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   refreshToken: () => Promise<string | null>;
+  isLoggedIn: boolean;
 }
 
 interface Props {
@@ -30,33 +30,36 @@ export const AuthContext = createContext<IAuthContext | undefined>(undefined);
 export const AuthContextProvider: FC<Props> = ({ children }) => {
   const [user, setUser] = useState<IUser>(initialUser);
   const [loading, setLoading] = useState(true);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [fetchCount, setFetchCount] = useState<number>(0);
 
   useEffect(() => {
-    console.log("hey")
     const token = localStorage.getItem('token');
 
     const fetchUser = async (): Promise<void> => {
-      console.log("fetch called")
       try {
-        console.log("try part runned")
         const response = await axios.post('/me',{}, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log("res data", response.data)
-        setUser(response.data.user);
-      } catch (error) {
-        console.error('Fetch user error:', error);
+        if(response.status === 200) {
+          setLoading(false);
+        }
+        setUser(response.data);  
+      } catch (error) { 
         if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
           const newToken = await refreshToken();
           if (newToken) {
-            console.log(newToken)
             localStorage.setItem('token', newToken);
+            setIsLoggedIn(true)
           } else {
             logout(); 
+            setIsLoggedIn(false);
             setLoading(false);
             return;
           }
+        } else {
+          setLoading(false);
+          setIsLoggedIn(false);
         }
         setLoading(false);
       }
@@ -82,7 +85,6 @@ export const AuthContextProvider: FC<Props> = ({ children }) => {
     if (refreshToken) {
       const response = await axios.post('/refresh-token', { refreshToken });
       const newToken = response.data.token;
-      console.log("refresh-token", newToken)
       localStorage.setItem('token', newToken);
       return newToken;
     }
@@ -93,7 +95,8 @@ export const AuthContextProvider: FC<Props> = ({ children }) => {
     user,
     login,
     logout,
-    refreshToken
+    refreshToken,
+    isLoggedIn
   };
 
   return (

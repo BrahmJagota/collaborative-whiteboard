@@ -7,8 +7,6 @@ isFill: boolean,
 setIsFill: (isFill: boolean) => void;
 color: string,
 setColor: (color: string) => void;
-roomId: string,
-setRoomId: (roomId: string) => void;
 }
 
 interface Props {
@@ -23,7 +21,7 @@ export const ToolsContextProvider = ({ children }: Props) => {
     const [color, setColor] = useState<string>("black   ");
     const [roomId, setRoomId] = useState<string>('');
     return (
-        <ToolsContext.Provider value={{selectedTool, setSelectedTool, isFill, setIsFill, color, setColor, roomId, setRoomId}}> 
+        <ToolsContext.Provider value={{selectedTool, setSelectedTool, isFill, setIsFill, color, setColor}}> 
         { children }
         </ToolsContext.Provider>
     )

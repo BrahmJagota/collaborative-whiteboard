@@ -16,8 +16,6 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
 app.use(bodyParser.json());
 router.post('/signup', async (req, res) => {
     const { name, email, password } = req.body;
-  
-    // console.log(req.body.name, req.body.email, req.body.password)
     try {
       const existingUser = await UserModel.findOne({ email });
       if (existingUser) {
@@ -54,38 +52,28 @@ router.post('/signup', async (req, res) => {
   });
 
   router.post('/refresh-token', async (req: Request, res: Response) => {
-    console.log("refresh route called")
   const { refreshToken } = req.body;
-    console.log("refresh token", refreshToken)
   try {
     if (!refreshToken) {
-      console.log("no refresh token")
       return res.status(401).send({ message: 'Refresh token is required' });
     }
 
     jwt.verify(refreshToken, JWT_REFRESH_SECRET, (err: VerifyErrors | null, decoded: any) => {
       if (err) {
-        console.log("errrrrr",err)
         return res.status(403).send({ message: 'Invalid refresh token' });
       }
 
       const { userId } = decoded as  JwtPayload;
-      console.log("userIdd",userId)
       const newToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' });
-      console.log("new token", newToken)
       res.json({ token: newToken });
     });
   } catch (error) {
-    console.error('Token refresh error: ', error);
     res.status(500).send({ message: 'An internal server error occurred' });
   }
 });
   router.post('/me', verifyToken,async (req, res) => {
-    console.log("me route called")
     const token = req.headers.authorization?.split(' ')[1];
-    console.log("token", token)
     if (!token) {
-      console.log("no token")
       return res.status(401).json({ message: 'Authentication token is missing' });
       }
     try{
@@ -105,7 +93,6 @@ router.post('/signup', async (req, res) => {
       return res.status(200).json(user);
     }
      catch (err) {
-      console.log(err);
       res.status(500).json({message: "An error occurred."});
     }
   })

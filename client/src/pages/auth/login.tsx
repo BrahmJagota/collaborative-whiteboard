@@ -1,34 +1,37 @@
 import {useState, useEffect} from 'react'; 
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../../components/context/AuthContext';
+
     export const Login = () => {
         const navigate = useNavigate();
+        const {isLoggedIn} = useAuthContext()
         const [email, setEmail] = useState('');
         const [password, setPassword] = useState('');
         const [error, setError] = useState<string | null>(null);
-            useEffect(() => {
-                const token = localStorage.getItem('token');
-                if (token) {
-                    navigate('/');
-                }
-            }, []);
-
+useEffect(()=> {
+  if (!isLoggedIn) {
+    navigate('/login');
+} else {
+  navigate('/')
+}
+}, [isLoggedIn])
         const handleSubmit = async (e: React.FormEvent) => {
             e.preventDefault();
             setError(null);
         
             try {
-            const response = await axios.post('http://localhost:5000/login', {
+            const response = await axios.post('/login', {
                 email,
                 password,
             });
-        
+        if(response) {
             const { token, refreshToken } = response.data;
             
             localStorage.setItem('token', token);
             localStorage.setItem('refreshToken', refreshToken);
-            console.log('Login successful, token:', token);
             navigate('/');
+        }
             } catch (err) {
             if (axios.isAxiosError(err) && err.response) {
                 setError(err.response.data.message || 'Login failed');
@@ -71,7 +74,7 @@ import { useNavigate } from 'react-router-dom';
                 />
                 <span className="ml-2 text-gray-700">Remember Me</span>
               </label>
-              <a href="#" className="text-gray-700 hover:underline">Forgot password?</a>
+              <Link to="/signup" className="text-gray-700 hover:underline" >Sign up </Link>
             </div>
             {error && <div className="mb-4 text-red-500">{error}</div>}
             <button

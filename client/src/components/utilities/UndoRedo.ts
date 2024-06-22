@@ -5,7 +5,3 @@ export function undo (stack: ImageData[], data: ImageData) {
 export function redo (stack: ImageData[]) {
     stack.pop()
 }
-
-export function test () {
-    console.log("test successfull")
-}

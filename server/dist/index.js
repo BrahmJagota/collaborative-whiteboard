@@ -15,7 +15,6 @@ const corsOptions = {
     credentials: true,
 };
 app.use((0, cors_1.default)(corsOptions));
-// console.log(io)
 const io = new socket_io_1.Server(httpServer, {
     cors: {
         origin: "http://localhost:3000",
@@ -23,21 +22,12 @@ const io = new socket_io_1.Server(httpServer, {
     },
 });
 io.on('connection', (socket) => {
-    console.log('A user connected. Socket ID:', socket.id);
     socket.on('disconnect', () => {
-        console.log('User disconnected. Socket ID:', socket.id);
     });
-    socket.on('error', (err) => {
-        console.error('Socket error:', err);
-    });
-    socket.on("hello", (data) => console.log("data", data));
     socket.on("draw", (data) => {
         socket.broadcast.emit("draw", data);
     });
 });
-app.get("/", (req, res, Response) => {
-    res.send("Hello from me");
-});
 httpServer.listen(5000, () => {
-    console.log("app is listening to localhost:5000");
+    console.log("app is listening");
 });
