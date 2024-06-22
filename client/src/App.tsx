@@ -12,10 +12,10 @@ import { SignUp } from './pages/auth/signup';
 import Home from './pages/Home';
 import { AuthContextProvider } from './components/context/AuthContext';
 import axios from 'axios';
-axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL;
+axios.defaults.baseURL = "https://collaborative-whiteboard-28zs.onrender.com";
 
 function App() {  
-  const socket: Socket = io('http://localhost:5000');
+  const socket: Socket = io('https://collaborative-whiteboard-28zs.onrender.com');
   return (
     <AuthContextProvider>
     <ToolsContextProvider>
