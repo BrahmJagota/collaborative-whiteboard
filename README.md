@@ -9,3 +9,5 @@ run **install-client** and **dev:client**
 
 
 There are some bugs right now am working on them 
+
+### share the url with your friend and start working with your board now both of you have access to the same board
