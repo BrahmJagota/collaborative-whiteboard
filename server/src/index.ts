@@ -14,7 +14,7 @@ import{ UserModel,RoomModel, IRoom } from './database/models';
 const httpServer = http.createServer(app);
 
 const corsOptions = {
-  origin: "*",
+  origin: "https://collaborative-whiteboard-cngayikxa-brahmjagotas-projects.vercel.app/",
   methods: ["POST", "GET"],
   credentials: true,
 };
